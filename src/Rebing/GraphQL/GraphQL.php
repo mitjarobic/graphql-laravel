@@ -1,6 +1,11 @@
 <?php namespace Rebing\GraphQL;
 
 use GraphQL\Error\Error;
+use Ratchet\Client;
+use Ratchet\Client\WebSocket;
+use Ratchet\Http\HttpServer;
+use Ratchet\Server\IoServer;
+use Ratchet\WebSocket\WsServer;
 use Rebing\GraphQL\Error\ValidationError;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Schema;
@@ -8,7 +13,18 @@ use GraphQL\Type\Definition\ObjectType;
 use Rebing\GraphQL\Events\SchemaAdded;
 use Rebing\GraphQL\Exception\SchemaNotFound;
 use Rebing\GraphQL\Support\PaginationType;
+use Rebing\GraphQL\Support\Subscription\SubscriptionManager;
+use Rebing\GraphQL\Support\Subscription\SubscriptionServer;
 use Session;
+
+const INIT = 'init';
+const INIT_SUCCESS = 'init_success';
+const INIT_FAIL = 'init_fail';
+const SUBSCRIPTION_START = 'subscription_start';
+const SUBSCRIPTION_END = 'subscription_end';
+const SUBSCRIPTION_SUCCESS = 'subscription_success';
+const SUBSCRIPTION_FAIL = 'subscription_fail';
+const SUBSCRIPTION_DATA = 'subscription_data';
 
 class GraphQL {
 
@@ -335,5 +351,67 @@ class GraphQL {
         }
 
         return $routeName ?: preg_replace($schemaParameterPattern, '{' . $name . '}', $queryRoute);
+    }
+
+    /**
+     * Returns a new websocket server bootstraped for GraphQL subscriptions.
+     *
+     * @param Schema $schema
+     * @param array  $filters
+     * @param array  $rootValue
+     * @param array  $context
+     * @param int    $port
+     * @param string $host
+     *
+     * @return IoServer
+     */
+    public static function server(
+        Schema $schema,
+        array $filters = null,
+        array $rootValue = null,
+        array $context = null,
+        $port = 8080,
+        $host = '0.0.0.0'
+    ) {
+
+        $manager = new SubscriptionManager($schema, $filters, $rootValue, $context);
+        $server = new SubscriptionServer($manager);
+
+        return IoServer::factory(
+            new HttpServer(
+                new WsServer(
+                    $server
+                )
+            ),
+            $port,
+            $host
+        );
+
+    }
+
+    /**
+     * Publishes the given $payload to the $subscribeName.
+     *
+     * @param string $subscriptionName
+     * @param mixed  $payload
+     */
+    public static function publish($subscriptionName, $payload = null)
+    {
+
+        //$subscriptionsEndpoint = Container\get('graphql_subscriptions_endpoint');
+        $subscriptionsEndpoint = config('graphql.subscriptions_endpoint', 'ws://localhost').":".config('graphql.subscriptions_port', '8080');
+
+        Client\connect($subscriptionsEndpoint,  ['graphql-subscriptions'])->then(function (WebSocket $conn) use ($subscriptionName, $payload) {
+
+            $request = [
+                'type'         => SUBSCRIPTION_DATA,
+                'subscription' => $subscriptionName,
+                'payload'      => $payload,
+            ];
+
+            $conn->send(json_encode($request));
+            $conn->close();
+        });
+
     }
 }
