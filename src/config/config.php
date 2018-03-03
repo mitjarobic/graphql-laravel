@@ -97,6 +97,9 @@ return [
             'mutation' => [
                 'example_mutation'  => ExampleMutation::class,
             ],
+            'subscriptoins' => [
+                'example_subscription' => ExampleSubcription::class,
+            ],
             'middleware' => []
         ],
     ],
@@ -126,5 +129,13 @@ return [
 
     // You can set the key, which will be used to retrieve the dynamic variables
     'params_key'    => 'params',
+
+    // Websocket server
+    //
+    // Example: ws://localhost:8080
+    //
+    'subscriptions_endpoint' => null, //default: ws://localhost
+    'subscriptions_port' => null //default: 8080
+
     
 ];
