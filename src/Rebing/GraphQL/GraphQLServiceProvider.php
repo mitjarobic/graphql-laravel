@@ -3,6 +3,7 @@
 use Illuminate\Support\ServiceProvider;
 use Rebing\GraphQL\Console\MutationMakeCommand;
 use Rebing\GraphQL\Console\QueryMakeCommand;
+use Rebing\GraphQL\Console\RunWsServerCommand;
 use Rebing\GraphQL\Console\TypeMakeCommand;
 
 class GraphQLServiceProvider extends ServiceProvider
@@ -109,13 +110,14 @@ class GraphQLServiceProvider extends ServiceProvider
     /**
      * Register console commands
      *
-     * @return void
+     * @return voidgit
      */
     public function registerConsole()
     {
         $this->commands(TypeMakeCommand::class);
         $this->commands(QueryMakeCommand::class);
         $this->commands(MutationMakeCommand::class);
+        $this->commands(RunWsServerCommand::class);
     }
 
     /**
