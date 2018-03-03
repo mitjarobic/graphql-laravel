@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
 use Ratchet\ConnectionInterface;
+use Rebing\GraphQL;
 
 class SubscriptionManager
 {
@@ -38,7 +39,7 @@ class SubscriptionManager
         $this->connSubStorage->offsetSet($conn, []);
 
         $response = [
-            'type' => INIT_SUCCESS,
+            'type' => Graphql\INIT_SUCCESS,
         ];
 
         $conn->send(json_encode($response));
@@ -68,7 +69,7 @@ class SubscriptionManager
             $this->connSubStorage->offsetSet($conn, $connSubscriptions);
 
             $response = [
-                'type' => SUBSCRIPTION_SUCCESS,
+                'type' => Graphql\SUBSCRIPTION_SUCCESS,
                 'id'   => $subscription['id'],
             ];
 
@@ -77,7 +78,7 @@ class SubscriptionManager
 
 
             $response = [
-                'type'    => SUBSCRIPTION_FAIL,
+                'type'    => Graphql\SUBSCRIPTION_FAIL,
                 'id'      => $subscription['id'],
                 'payload' => [
                     'errors' => [
@@ -118,7 +119,7 @@ class SubscriptionManager
             )->toArray();
 
             $response = [
-                'type'    => SUBSCRIPTION_DATA,
+                'type'    => Graphql\SUBSCRIPTION_DATA,
                 'payload' => $result,
                 'id'      => $subscription['id'],
             ];

@@ -132,10 +132,9 @@ return [
 
     // Websocket server
     //
-    // Example: ws://localhost:8080
+    // Example: ws://localhost:8888
     //
-    'subscriptions_endpoint' => null, //default: ws://localhost
-    'subscriptions_port' => null //default: 8080
+    'subscriptions_endpoint' => 'ws://localhost',
+    'subscriptions_port' => '8888'
 
-    
 ];
