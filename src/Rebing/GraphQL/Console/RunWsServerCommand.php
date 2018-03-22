@@ -40,7 +40,7 @@ class RunWsServerCommand extends Command
     {
         $schema = app('graphql')->schema();
         $filters = [];
-        GraphQL::server($schema, $filters, null, null, config('graphql.subscriptions_port'))
+        GraphQL::ws($schema, $filters, '0.0.0.0', config('graphql.subscriptions_port') )
             ->run();
     }
 }

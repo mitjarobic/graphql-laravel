@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Rebing\GraphQL\Support\Subscription;
 
 use Ratchet\ConnectionInterface;
@@ -7,11 +8,11 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\WebSocket\WsServerInterface;
 use Rebing\GraphQL;
 
-class SubscriptionServer implements MessageComponentInterface, WsServerInterface
+class WsServer implements MessageComponentInterface, WsServerInterface
 {
     protected $manager;
 
-    public function __construct(SubscriptionManager $manager)
+    public function __construct(WsManager $manager)
     {
         $this->manager = $manager;
     }
@@ -25,17 +26,17 @@ class SubscriptionServer implements MessageComponentInterface, WsServerInterface
         $data = json_decode($message, true);
 
         switch ($data['type']) {
-            case Graphql\INIT:
-                return $this->manager->handleInit($conn);
+            case Graphql\GQL_CONNECTION_INIT:
+                return $this->manager->handleConnectionInit($conn);
 
-            case Graphql\SUBSCRIPTION_START:
-                return $this->manager->handleSubscriptionStart($conn, $data);
+            case Graphql\GQL_START:
+                return $this->manager->handleStart($conn, $data);
 
-            case Graphql\SUBSCRIPTION_DATA:
-                return $this->manager->handleSubscriptionData($data);
+            case Graphql\GQL_DATA:
+                return $this->manager->handleData($data);
 
-            case Graphql\SUBSCRIPTION_END:
-                return $this->manager->handleSubscriptionEnd($conn, $data);
+            case Graphql\GQL_STOP:
+                return $this->manager->handleStop($conn, $data);
         }
     }
 
@@ -45,10 +46,13 @@ class SubscriptionServer implements MessageComponentInterface, WsServerInterface
 
     public function onError(ConnectionInterface $conn, \Exception $exception)
     {
+        var_dump($exception->getMessage());
+        var_dump($exception->getFile());
+        var_dump($exception->getLine());
     }
 
     public function getSubProtocols()
     {
-        return ['graphql-subscriptions'];
+        return ['graphql-ws'];
     }
 }
