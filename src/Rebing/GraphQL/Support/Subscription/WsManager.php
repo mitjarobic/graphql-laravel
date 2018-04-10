@@ -78,7 +78,13 @@ class WsManager
 
             $document = Parser::parse($query);
             $operation = $document->definitions[0]->operation;
+
             $result = $this->execute($query, $payload, $variables);
+
+            //unset error from subscription resolver
+            if ($operation == 'subscription' && array_key_exists('operationName', $payload)) {
+                unset($result['errors']);
+            }
 
             $response = [
                 'type'    => Graphql\GQL_DATA,
@@ -89,6 +95,7 @@ class WsManager
             $conn->send(json_encode($response));
 
             if ($operation == 'subscription') {
+
                 $data['name'] = $this->getSubscriptionName($document);
                 $data['conn'] = $conn;
 
