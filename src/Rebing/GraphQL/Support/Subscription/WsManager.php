@@ -82,7 +82,7 @@ class WsManager
             $result = $this->execute($query, $payload, $variables);
 
             //unset error from subscription resolver
-            if ($operation == 'subscription' && array_key_exists('operationName', $payload)) {
+            if ($operation == 'subscription') {
                 unset($result['errors']);
             }
 
