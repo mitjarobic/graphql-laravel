@@ -394,15 +394,22 @@ class GraphQL {
      * @param string $subscriptionName
      * @param mixed  $payload
      */
-    public static function publish($subscriptionName, $payload = null)
+    /**
+     * Publishes the given $payload to the $subscribeName.
+     *
+     * @param string $subscriptionName
+     * @param mixed  $payload
+     */
+    public static function publish($subscriptionName, $payload = null, $action = 'crud_action_missing')
     {
         $wsEndpoint = config('graphql.subscriptions_endpoint', 'ws://localhost').":".config('graphql.subscriptions_port', '8080');
 
-        Client\connect($wsEndpoint, ['graphql-ws'])->then(function (WebSocket $conn) use ($subscriptionName, $payload) {
+        Client\connect($wsEndpoint, ['graphql-ws'])->then(function (WebSocket $conn) use ($subscriptionName, $payload, $action) {
             $request = [
                 'type'         => GQL_DATA,
                 'subscription' => $subscriptionName,
                 'payload'      => $payload,
+                'action'        => $action
             ];
             $conn->send(json_encode($request));
             $conn->close();
