@@ -66,7 +66,6 @@ class WsManager
     public function handleStart(ConnectionInterface $conn, array $data)
     {
         try {
-
             $payload = array_get($data, 'payload');
             $query = array_get($payload, 'query');
 
@@ -79,17 +78,17 @@ class WsManager
             $document = Parser::parse($query);
             $operation = $document->definitions[0]->operation;
 
-            $result = $this->execute($query, $payload, $variables);
+//            $result = $this->execute($query, $payload, $variables);
 
             //unset error from subscription resolver
-            if ($operation == 'subscription') {
-                unset($result['errors']);
-            }
+//            if ($operation == 'subscription') {
+//                unset($result['errors']);
+//            }
 
             $response = [
                 'type'    => Graphql\GQL_DATA,
                 'id'      => $data['id'],
-                'payload' => $result,
+                'payload' => [],
             ];
 
             $conn->send(json_encode($response));
