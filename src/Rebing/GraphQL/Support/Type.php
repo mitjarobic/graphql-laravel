@@ -3,8 +3,10 @@
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\UnionType;
 use Illuminate\Support\Fluent;
 
 class Type extends Fluent {
@@ -13,6 +15,7 @@ class Type extends Fluent {
     
     protected $inputObject = false;
     protected $enumObject = false;
+    protected $unionType = false;
 
     public function attributes()
     {
@@ -28,7 +31,7 @@ class Type extends Fluent {
     {
         return [];
     }
-    
+
     protected function getFieldResolver($name, $field)
     {
         if(isset($field['resolve']))
@@ -62,6 +65,10 @@ class Type extends Fluent {
                 $field = app($field);
                 $field->name = $name;
                 $allFields[$name] = $field->toArray();
+            }
+            elseif ($field instanceof FieldDefinition)
+            {
+                $allFields[$field->name] = $field;
             }
             else
             {
@@ -97,7 +104,7 @@ class Type extends Fluent {
         {
             $attributes['interfaces'] = $interfaces;
         }
-        
+
         return $attributes;
     }
 

@@ -103,7 +103,7 @@ return [
             'middleware' => []
         ],
     ],
-    
+
     // The types available in the application. You can then access it from the
     // facade like this: GraphQL::type('user')
     //
@@ -117,7 +117,7 @@ return [
         'example'           => ExampleType::class,
         'relation_example'  => ExampleRelationType::class,
     ],
-    
+
     // This callable will be passed the Error object for each errors GraphQL catch.
     // The method should return an array representing the error.
     // Typically:
@@ -135,6 +135,16 @@ return [
     // Example: ws://localhost:8888
     //
     'subscriptions_endpoint' => 'ws://localhost',
-    'subscriptions_port' => '8888'
+    'subscriptions_port' => '8888',
 
+    /*
+     * Options to limit the query complexity and depth. See the doc
+     * @ https://github.com/webonyx/graphql-php#security
+     * for details. Disabled by default.
+     */
+    'security' => [
+        'query_max_complexity' => null,
+        'query_max_depth' => null,
+        'disable_introspection' => false
+    ]
 ];
