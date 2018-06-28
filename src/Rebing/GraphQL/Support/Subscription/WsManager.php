@@ -78,12 +78,16 @@ class WsManager
 
             $document = Parser::parse($query);
             $operation = $document->definitions[0]->operation;
-//            $result = $this->execute($query, $payload, $variables);
+            $result = $this->execute($query, $payload, $variables);
+
+            if(array_has($result, 'errors')){
+                unset($result['errors']);
+            }
 
             $response = [
                 'type'    => Graphql\GQL_DATA,
                 'id'      => $data['id'],
-                'payload' => [],
+                'payload' => $result
             ];
 
             $conn->send(json_encode($response));
