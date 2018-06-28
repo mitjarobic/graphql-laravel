@@ -78,12 +78,12 @@ class WsManager
 
             $document = Parser::parse($query);
             $operation = $document->definitions[0]->operation;
-            $result = $this->execute($query, $payload, $variables);
+//            $result = $this->execute($query, $payload, $variables);
 
             $response = [
                 'type'    => Graphql\GQL_DATA,
                 'id'      => $data['id'],
-                'payload' => $result,
+                'payload' => [],
             ];
 
             $conn->send(json_encode($response));
@@ -137,6 +137,7 @@ class WsManager
         foreach ($subscriptions as $subscription) {
             try {
                 $payload = array_get($data, 'payload');
+                $action = array_get($data, 'action');
                 $query = array_get($subscription['payload'], 'query');
                 $variables = array_get($subscription['payload'], 'variables');
 
@@ -146,12 +147,19 @@ class WsManager
                     }
                 }
 
+                $payload = [
+                    'action' => $action,
+                    'object' => $payload
+                ];
+
                 $result = $this->execute($query, $payload, $variables);
+
+                $result['action'] = $action;
 
                 $response = [
                     'type'    => Graphql\GQL_DATA,
                     'id'      => $subscription['id'],
-                    'payload' => $result,
+                    'payload' => $result
                 ];
 
                 $subscription['conn']->send(json_encode($response));
