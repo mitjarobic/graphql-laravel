@@ -146,9 +146,14 @@ class WsManager
                 $variables = array_get($subscription['payload'], 'variables');
 
                 if (!is_null($this->filters) && isset($this->filters[$subscription['name']])) {
-                    if (!$this->filters[$subscription['name']]($payload, $variables, $this->context)) {
+                    $object = new $this->filters[$subscription['name']];
+                    if(method_exists($object, 'filter')
+                        && !$object->filter($payload, $variables, $this->context)){
                         continue;
                     }
+//                        if (!$this->filters[$subscription['name']]($payload, $variables, $this->context)) {
+//                        continue;
+//                    }
                 }
 
                 $payload = [

@@ -39,7 +39,7 @@ class RunWsServerCommand extends Command
     public function handle()
     {
         $schema = app('graphql')->schema();
-        $filters = [];
+        $filters = array_get(config('graphql.schemas.'.config('graphql.default_schema')), 'subscription', []);
         GraphQL::ws($schema, $filters, '0.0.0.0', config('graphql.subscriptions_port') )
             ->run();
     }
